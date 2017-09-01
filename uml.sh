@@ -9,27 +9,27 @@ cd linux-4.9-rc5
 #build kernel
 echo "START BUILDING KERNEL SOURCE CODE..."
 make defconfig ARCH=um
-echo "make default config.."
-echo "building start.."
+echo "MAKE DEFAULT CONFIG.."
+echo "BUILDING START.."
 make vmlinux ARCH=um
 cp vmlinux /usr/local/bin
-echo "building finished.."
+echo "BUILDING FINISHED.."
 
 #make rootfs
 echo "INSTALL DEBOOTSTRAP.."
 apt-get install debootstrap
 echo "INSTALL FINISH"
-echo "make a root filesystem"
+echo "START BUILDING ROOT FILESYSTEM.."
 fallocate -l 4G rootfs && mkfs.ext4 rootfs
 mkdir mnt && mount rootfs mnt
 debootstrap --arch=amd64 xenial mnt/
-echo "please set your root password and exit"
+echo "please use the command 'passwd' to set your root password theninput 'exit' to quit"
 gnome-terminal -t "set root password" -x bash -c "chroot mnt"
 echo "/dev/ubda / ext4 defaults 0 0" > mnt/etc/fstab
 
-omount mnt
+umount mnt
 
-#rum uml
+#run uml
 apt-get install uml-utilities screen
 vmlinux ubda=rootfs mem=256M con=pts con1=fd:0,fd:1
 
