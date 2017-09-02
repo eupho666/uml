@@ -1,3 +1,10 @@
+log() {
+	msg = $1
+	echo $msg > log.file
+
+}
+
+
 #download some required files
 echo "PREPARE ENVIRONMENT..."
 apt-get update && apt-get install build-essential libtool automake libncurses5-dev kernel-package
@@ -12,7 +19,8 @@ make defconfig ARCH=um
 echo "MAKE DEFAULT CONFIG.."
 echo "BUILDING START.."
 make vmlinux ARCH=um
-cp vmlinux /usr/local/bin
+cp vmlinux ..
+cd ..
 echo "BUILDING FINISHED.."
 
 #make rootfs
@@ -22,11 +30,11 @@ echo "INSTALL FINISH"
 echo "START BUILDING ROOT FILESYSTEM.."
 fallocate -l 4G rootfs && mkfs.ext4 rootfs
 mkdir mnt && mount rootfs mnt
-debootstrap --arch=amd64 xenial mnt/
+debootstrap --arch amd64 xenial mnt/
 echo "please use the command 'passwd' to set your root password theninput 'exit' to quit"
-gnome-terminal -t "set root password" -x bash -c "chroot mnt"
+#gnome-terminal -t "set root password" -x bash -c "chroot mnt"
 echo "/dev/ubda / ext4 defaults 0 0" > mnt/etc/fstab
-
+wait 3
 umount mnt
 
 #run uml
