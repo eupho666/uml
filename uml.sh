@@ -1,18 +1,24 @@
-## log file
-function log() {
-	msg = $1
-	echo $msg >> log.txt
+#!/bin/bash
+# author:eupho666
 
-}
 
-## green echo
-function green(){
+## green echo and log
+green(){
 	echo -e "\033[32m\033[01m\033[05m[ $1 ]\033[0m"
-	log $1
+	name=`pwd`
+	if [ ${name:(-3):3} = "hhh" ]
+	then
+		echo $1 >> ../log.txt
+	elif [ ${name:(-3):3} = "rc5" ]
+	then
+		echo $1 >> ../../log.txt
+	else
+		echo $1 >> log.txt
+	fi
 }
 
 ## error
-function check() {
+check() {
 	if [ $? -eq 0]
 	then
 		log "$@ sucessed."
@@ -22,22 +28,38 @@ function check() {
 		log "end at : ${end_date}"
 		log "==========END=========="
 		exit 1
+	fi
 }
 
+# check permission
+if [ $EUID -nq 0 ]
+then
+	echo "please run as root permission"
+	exit 1
+fi
+
+# create log file
+if [ -ne "log.txt"]
+then
+	touch log.txt
+fi
+
+# start
+green "==========START=========="
+
+date =`date "+%Y-%m-%d %H:%M:%S"`
+user =`whoami`
+green "${date} ${user} execute ..."
+
 #download some required files
-log "==========START=========="
-
-date = `date "+%Y-%m-%d %H:%M:%S"`
-user = `whoami`
-log "${date} ${user} execute ..."
-
 green "PREPARE ENVIRONMENT..."
 apt-get update && apt-get install build-essential libtool automake libncurses5-dev kernel-package
 green "PREPARE DONE"
 
 green "DOWNLOAD KERNEL SOURCE CODE..."
-mkdir uml && cd uml
-wget http://mirrors.ustc.edu.cn/kernel.org/linux/kernel/v4.x/testing/linux-4.9-rc5.tar.gz -O kernel.tar.gz && tar -xzf kernel.tar.gz
+mkdir uml-hhh && cd uml-hhh
+wget http://mirrors.ustc.edu.cn/kernel.org/linux/kernel/v4.x/testing/linux-4.9-rc5.tar.gz -O kernel.tar.gz
+tar -xzvf kernel.tar.gz
 cd linux-4.9-rc5
 
 #build kernel
@@ -81,6 +103,7 @@ apt-get install uml-utilities screen
 green "SET UP UML"
 vmlinux ubda=rootfs mem=256M con=pts con1=fd:0,fd:1
 check "set up"
+rm -rf kernel.tar.gz
 end_date = `date "+%Y-%m-%d %H:%M:%S"`
-log "end at : ${end_date}"
-log "==========END=========="
+green "end at : ${end_date}"
+green "==========END=========="
