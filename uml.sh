@@ -100,7 +100,8 @@ check "[*]umount"
 
 #run uml
 apt-get install uml-utilities screen
-green "[*]SET UP UML"
+green "[*]SET UP UML,RUN COMMAND:"
+green "./vmlinux ubda=rootfs mem=256M con=pts con1=fd:0,fd:1"
 ./vmlinux ubda=rootfs mem=256M con=pts con1=fd:0,fd:1 | tee -a ../log.txt
 check "set up"
 rm -rf kernel.tar.gz
